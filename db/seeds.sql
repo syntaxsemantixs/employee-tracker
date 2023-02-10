@@ -14,7 +14,7 @@ VALUES
 ("Product Manager",70000, 4),
 ("Logistics Coordinator", 55000, 5);
 
-INSERT INTO employee (lasName, firName, roleId, managerId)
+INSERT INTO employee (lastName, firstName, roleId, managerId)
 VALUES
 ("Berger", "Brian", 1, 5),
 ("James", "Michele", 2, 5),
