@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS employees_db;
+DROP DATABASE IF EXISTS employer_db;
 
-CREATE DATABASE employees_db;
+CREATE DATABASE employer_db;
 
 USE employer_db;
 
@@ -21,8 +21,8 @@ CREATE TABLE role (
 
 CREATE TABLE employee (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    firName VARCHAR(30) NOT NULL,
-    lasName VARCHAR(30) NOT NULL,
+    fName VARCHAR(30) NOT NULL,
+    lName VARCHAR(30) NOT NULL,
     roleId INT,
     managerId INT,
     FOREIGN KEY (roleId)

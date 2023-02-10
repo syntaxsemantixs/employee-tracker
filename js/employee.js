@@ -1,6 +1,6 @@
-function Employee(lastName, firstName, roleId, managerId) {
-    this.lastName = lastName;
-    this.firstName = firstName;
+function Employee(lName, fName, roleId, managerId) {
+    this.lName = lName;
+    this.ftName = fName;
     this.roleId = roleId;
     this.managerId = managerId;
 }

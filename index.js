@@ -23,7 +23,7 @@ const startApp = () => {
                 type: 'list',
                 name: 'choice',
                 message: 'Please choose from the selection below:',
-                choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'update an employee manager']
+                choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role',]
             }
         ])
         .then(function (data) {
@@ -63,13 +63,11 @@ const startApp = () => {
                 addEmployee();
             } else if (data.choice === 'update employee role') {
                 updateRole();
-            } else if (data.choice === 'update an employee manager') {
-                updateMgrId();
             }
         })
 }
 
-const addDepartment = () => {
+const newDepartment = () => {
     return inquirer.prompt
 
         ([
@@ -97,7 +95,7 @@ const addDepartment = () => {
         })
 }
 
-const addRole = () => {
+const newRole = () => {
     return inquirer.prompt
         ([
             {
@@ -142,7 +140,7 @@ const addRole = () => {
         })
 }
 
-const addEmployee = () => {
+const newEmployee = () => {
     return inquirer.prompt
 
     ([
