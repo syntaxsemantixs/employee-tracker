@@ -14,10 +14,10 @@ VALUES
 ("Product Manager",70000, 4),
 ("Logistics Coordinator", 55000, 5);
 
-INSERT INTO employee (lasName, firName, roleId, managerId)
+INSERT INTO employee (lName, fName, roleId)
 VALUES
-("Berger", "Brian", 1, 5),
-("James", "Michele", 2, 5),
-("Ormeno", "Gerardo", 3, 5),
-("Dempsey", "William", 4, 3),
-("Den", "Jeff", 5, NULL);
+("Berger", "Brian", 1),
+("James", "Michele", 2),
+("Ormeno", "Gerardo", 3),
+("Dempsey", "William", 4),
+("Den", "Jeff", 5);
