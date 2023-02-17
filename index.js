@@ -48,19 +48,21 @@ const startApp = () => {
                     }
                 })
             } else if (data.choice === 'view all employees') {
-                if (err) {
-                    console.log(err);
-                    return startApp();
-                } else {
-                    console.table(results);
-                    return startApp();
-                }
+                db.query('SELECT * FROM employee', function (err, results) {
+                    if (err) {
+                        console.log(err);
+                        return startApp();
+                    } else {
+                        console.table(results);
+                        return startApp();
+                    }
+                })
             } else if (data.choice === 'add a department') {
                 newDepartment();
             } else if (data.choice === 'add a role') {
                 newRole();
             } else if (data.choice === 'add a employee') {
-                addEmployee();
+                newEmployee();
             } else if (data.choice === 'update employee role') {
                 updateRole();
             }
@@ -97,6 +99,7 @@ const newDepartment = () => {
 
 const newRole = () => {
     return inquirer.prompt
+
         ([
             {
                 type: 'input',
@@ -113,125 +116,93 @@ const newRole = () => {
             let currRole = roleData.roleName
             let yearlySal = roleData.salary
 
-            db.promise().query('SELECT id AS FROM department')
+            db.promise().query('SELECT id AS name FROM department')
                 .then(([row, fields]) => {
-                    return inquirer.prompt
-                        ({
-                            type: 'list',
-                            name: 'departmentRole',
-                            message: 'Select which DEPARTMENT to add the ROLE too:',
-                            choices: row.filter(r => !!r.name).map(r => r.name),
-
-                        })
+                    return inquirer.prompt({
+                        type: 'list',
+                        name: 'departmentRole',
+                        message: 'Select which DEPARTMENT to add the Role too:',
+                        choices: row.filter(r => !!r.name).map(r => r.name),
+                    })
+                })
+                .then(function (roleDep) {
+                    let deptId = roleDep.departmentRole
+                    console.log(currRole)
+                    console.log(yearlySal)
+                    console.log(deptId)
+                    let val = [
+                        [currRole, yearlySal, deptId]
+                    ]
+                    db.query('INSERT INTO role (currRole, yearlySal, deptId) VALUES (?)', val, (err, results) => {
+                        console.log('Role has been created and added!');
+                        return startApp();
+                    })
                 })
         })
-        .then(function(roleDep) {
-            let deptId = roleDep.departmentRole
-            console.log(currRole)
-            console.log(yearlySal)
-            console.log(deptId)
-            let val = [
-                [currRole, yearlySal, deptId]
-            ]
-            db.query('INSERT INTO role (currRole, yearlySal, deptId) VALUES (?)', val, (err, results) => {
-                console.log('Role has been created and added!');
-                return startApp();
-            })
-        })
 }
-
 const newEmployee = () => {
     return inquirer.prompt
 
-    ([
-        {
-            type: 'input',
-            name: 'lastName',
-            message: 'Please enter your LAST name:'
-        },
-        {
-            type:'input',
-            name: 'firstName',
-            message: 'Please enter your FIRST name:'
-        }
-    ])
-    .then(function(emptyData) {
-        let lName = emptyData.lastName
-        let fName = emptyData.
-        
-        db.promise().query('SELECT roleId AS roleN FROM employee')
-        .then(([row, fields]) => {
-            return inquirer.prompt({
-                type: 'list',
-                name: 'whichRole',
-                message: 'Select which ROLE to add the EMPLOYEE to:',
-                choices: row.filter(a => !!a.currRole),
-            })
-        })
-    })
-    .then(function(empRoleData) {
-        let roleId = empRoleData.whichRole
-
-        db.promise().query('SELECT managerId FROM employee')
-        .then(([row, fields]) => {
-            return inquirer.prompt({
-                type: 'list',
-                name: 'theManager',
-                message: 'Select the MANAGER of the employee:',
-                choices: row.filter(m => !!m.managerId).map(m => m.managerId),
-            })
-        })
-
-    })
-    .then(function(empManData) {
-        let managerId = empManData.theManager
-        let empVal = [
-            [lName, fName, managerId, roleId]
-        ]
-        db.query('INSERT INTO employee (lName, fName, managerId, roleId) VALUES (?)', empVal, (err, results) => {
-            if(err) {
-                console.log(err);
-                return startApp();
-            } else {
-                console.log('Employee and all data has been saved succesfully!');
-                return startApp();
+        ([
+            {
+                type: 'input',
+                name: 'lastName',
+                message: 'Please enter your LAST name:'
+            },
+            {
+                type: 'input',
+                name: 'firstName',
+                message: 'Please enter your FIRST name:'
             }
+        ])
+        .then(function (newData) {
+            let lName = newData.lastName
+            let fName = newData.firstName
+
+            db.promise().query('SELECT roleId AS currRole FROM employee')
+                .then(([row, fields]) => {
+                    return inquirer.prompt({
+                        type: 'list',
+                        name: 'whichRole',
+                        message: 'Select which ROLE to add the EMPLOYEE to:',
+                        choices: row.filter(a => !!a.currRole).map(a => a.currRole),
+                    })
+                })
         })
-    })
 }
 
 const updateRole = () => {
     db.promise().query('SELECT fName FROM employee')
-    .then(([rows, fields]) => {
-        return inquirer.prompt({
-            type: 'list',
-            name: 'updateName',
-            message: 'Select employee to update:',
-            choices: rows.filter(u => !!u.fName ).map(u => u.fName),
-        })
-    })
-    .then(function(empNewRole) {
-        let nameToUpd = empNewRole.updateName
-
-        db.promise().query('SELECT roleId FROM employee')
         .then(([rows, fields]) => {
             return inquirer.prompt({
                 type: 'list',
-                name: 'updateRole',
-                message: 'SELECT the employees new role',
+                name: 'updateName',
+                message: 'Select employee to update:',
+                choices: rows.filter(u => !!u.fName).map(u => u.fName),
             })
         })
-    })
-    .then(function(updateContent) {
-        let newCont = updatedContent.updateRole
-        let newVal = [
-            [newCont]
-            [nameToUpd]
-        ]
-        db.query('UPDATE employee SET roleId = ? WHERE fName ?', newVal, (err, result) => {
-            return startApp()
+        .then(function (empNewRole) {
+            let nameToUpd = empNewRole.updateName
+
+            db.promise().query('SELECT roleId FROM employee')
+                .then(([rows, fields]) => {
+                    return inquirer.prompt({
+                        type: 'list',
+                        name: 'updateRole',
+                        message: 'SELECT the employees new role',
+                    })
+                })
         })
-    })
+        .then(function (updateContent) {
+            let newCont = updatedContent.updateRole
+            let newVal = [
+                [newCont]
+                [nameToUpd]
+            ]
+            db.query('UPDATE employee SET roleId = ? WHERE fName ?', newVal, (err, result) => {
+                return startApp()
+            })
+        })
 }
 
 startApp();
