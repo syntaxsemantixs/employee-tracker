@@ -14,4 +14,10 @@ VALUES
 ("Product Manager",70000, 4),
 ("Logistics Coordinator", 55000, 5);
 
-
+INSERT INTO employee (lName, fName, roleId)
+VALUES
+("Berger", "Brian", 1),
+("James", "Michele", 2),
+("Ormeno", "Gerardo", 3),
+("Dempsey", "William", 4),
+("Den", "Jeff", 5);

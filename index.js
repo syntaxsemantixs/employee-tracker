@@ -23,7 +23,7 @@ const startApp = () => {
                 type: 'list',
                 name: 'choice',
                 message: 'Please choose from the selection below:',
-                choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role',]
+                choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update employee role',]
             }
         ])
         .then(function (data) {
@@ -61,7 +61,7 @@ const startApp = () => {
                 newDepartment();
             } else if (data.choice === 'add a role') {
                 newRole();
-            } else if (data.choice === 'add a employee') {
+            } else if (data.choice === 'add an employee') {
                 newEmployee();
             } else if (data.choice === 'update employee role') {
                 updateRole();
@@ -134,8 +134,13 @@ const newRole = () => {
                         [currRole, yearlySal, deptId]
                     ]
                     db.query('INSERT INTO role (currRole, yearlySal, deptId) VALUES (?)', val, (err, results) => {
-                        console.log('Role has been created and added!');
-                        return startApp();
+                        if (err) { // if error, and error will display and you will be returned to the first question
+                            console.log(err);
+                            return startApp();
+                        } else {
+                            console.log('Role has been created and added!');
+                            return startApp();
+                        }
                     })
                 })
         })
@@ -153,7 +158,7 @@ const newEmployee = () => {
                 type: 'input',
                 name: 'firstName',
                 message: 'Please enter your FIRST name:'
-            }
+            },
         ])
         .then(function (newData) {
             let lName = newData.lastName
@@ -168,6 +173,22 @@ const newEmployee = () => {
                         choices: row.filter(a => !!a.currRole).map(a => a.currRole),
                     })
                 })
+                .then(function (empRoleData) {
+                    let roleId = empRoleData.whichRole
+                    let empVal = [
+                        [lName, fName, roleId]
+                    ]
+
+                    db.query('INSERT INTO employee (lName, fName, roleId) VALUES (?)', empVal, (err, results) => {
+                        if (err) {
+                            console.log(err);
+                            return startApp();
+                        } else {
+                            console.log('Role has been created and added!');
+                            return startApp();
+                        }
+                    })
+                })
         })
 }
 
@@ -177,31 +198,39 @@ const updateRole = () => {
             return inquirer.prompt({
                 type: 'list',
                 name: 'updateName',
-                message: 'Select employee to update:',
+                message: 'Select employees role to update:',
                 choices: rows.filter(u => !!u.fName).map(u => u.fName),
             })
         })
         .then(function (empNewRole) {
-            let nameToUpd = empNewRole.updateName
+            let nameUpdate = empNewRole.updateName
 
             db.promise().query('SELECT roleId FROM employee')
                 .then(([rows, fields]) => {
                     return inquirer.prompt({
                         type: 'list',
-                        name: 'updateRole',
+                        name: 'updateR',
                         message: 'SELECT the employees new role',
+                        choices: rows.filter(z => !!z.roleId).map(z => z.roleId),
                     })
                 })
-        })
-        .then(function (updateContent) {
-            let newCont = updatedContent.updateRole
-            let newVal = [
-                [newCont]
-                [nameToUpd]
-            ]
-            db.query('UPDATE employee SET roleId = ? WHERE fName ?', newVal, (err, result) => {
-                return startApp()
-            })
+                .then(function (updateContent) {
+                    let newCont = updateContent.updateR
+                    let newVal = [
+                        [newCont],
+                        [nameUpdate]
+                    ]
+                    db.query('UPDATE employee SET roleId = ? WHERE fName ?', newVal, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            console.log(newVal)
+                        } else {
+                            console.log(result.affectedRows + " record(s) updated");
+                            return startApp();
+                        }
+                        return startApp()
+                    })
+                })
         })
 }
 
