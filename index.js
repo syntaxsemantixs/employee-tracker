@@ -197,39 +197,42 @@ const updateRole = () => {
         .then(([rows, fields]) => {
             return inquirer.prompt({
                 type: 'list',
-                name: 'updateName',
+                name: 'fName',
                 message: 'Select employees role to update:',
                 choices: rows.filter(u => !!u.fName).map(u => u.fName),
             })
         })
         .then(function (empNewRole) {
-            let nameUpdate = empNewRole.updateName
+            let nameUpdate = empNewRole.fName
 
             db.promise().query('SELECT roleId FROM employee')
                 .then(([rows, fields]) => {
                     return inquirer.prompt({
                         type: 'list',
-                        name: 'updateR',
+                        name: 'roleId',
                         message: 'SELECT the employees new role',
                         choices: rows.filter(z => !!z.roleId).map(z => z.roleId),
                     })
                 })
                 .then(function (updateContent) {
-                    let newCont = updateContent.updateR
-                    let newVal = [
-                        [newCont],
-                        [nameUpdate]
-                    ]
-                    db.query('UPDATE employee SET roleId = ? WHERE fName ?', newVal, (err, result) => {
+                    const {roleId} = updateContent
+                    // const {fName} = empNewRole
+                    console.log(roleId)
+                    console.log(nameUpdate)
+                    // let newVal = {,
+                    //     nameUpdate
+                    // }
+                    db.query(`UPDATE employee SET roleId = ? WHERE fName = ?`,[roleId, nameUpdate], (err, result) => {
                         if (err) {
                             console.log(err)
-                            console.log(newVal)
                         } else {
                             console.log(result.affectedRows + " record(s) updated");
+                            console.log(result)
                             return startApp();
                         }
                         return startApp()
                     })
+
                 })
         })
 }
